@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BaiTap1</title>
+    <link rel="icon" type="image/png" sizes="16x16" href="https://katinat.vn/wp-content/uploads/2023/12/cropped-Kat-Logo-fa-rgb-05__1_-removebg-preview.png">
+    <!--Echo Echo-->
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+          crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+          integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
+          crossorigin="anonymous">
+
+    <!-- Bootstrap Star Rating CSS -->
+    <link href="https://cdn.jsdelivr.net/gh/kartik-v/bootstrap-star-rating@4.1.2/css/star-rating.min.css" media="all" rel="stylesheet" type="text/css" />
+
+    <!-- xZoom CSS từ CDN ổn định -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/payalord/xZoom@master/dist/xzoom.css">
+
+    <!-- HTML5 shim -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <style>
+        /* Fix conflict: Override zoom CSS for Bootstrap compatibility */
+        .xzoom-lens, .xzoom-lb { transform-origin: 0 0 !important; }
+        
+        /* Container ảnh sản phẩm */
+        .product-image {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        /* % Giảm giá - góc trên trái */
+        .discount-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #e74c3c;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            z-index: 10;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        /* Nhãn NEW / BEST SELLER - góc trên phải */
+        .status-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #27ae60;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 4px;
+            z-index: 10;
+            text-transform: uppercase;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .status-badge.best-seller {
+            background: #f39c12;
+        }
+
+        /* Ẩn badge khi xZoom active để tránh overlap */
+        .xzoom-preview .discount-badge,
+        .xzoom-preview .status-badge { display: none !important; }
+
+        .add-to-cart {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            padding: 5px 8px;
+            border-radius: 50%;
+            font-size: 18px;
+            z-index: 11;
+        }
+
+        .xzoom-container { margin-bottom: 15px; }
+        .xzoom-thumbs { text-align: center; }
+        .xzoom-thumbs a { display: inline-block; margin: 5px; }
+        .xzoom-thumbs img { max-width: 80px; height: auto; }
+
+        /* Fix Bootstrap grid conflict - chỉ override nếu cần */
+        /* .row { display: flex !important; flex-wrap: wrap !important; } */
+        /* .col-sm-6, .col-md-9 { position: relative !important; } */
+
+        /* Đảm bảo xZoom preview ở trên cùng */
+        .xzoom-preview { z-index: 9999 !important; }
+
+        /* Fallback CSS zoom nếu xZoom fail */
+        .product-image img.fallback-zoom {
+            transition: transform 0.3s ease;
+        }
+        .product-image:hover img.fallback-zoom {
+            transform: scale(1.5);
+        }
+
+        /* Star rating custom styles */
+        .rating-display { display: inline-block; margin-right: 5px; }
+        .rating-value { font-weight: bold; margin-left: 5px; }
+    </style>
+</head>
+<body>
+
+<!-- Navbar chính -->
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#main-navbar" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="https://katinat.vn/">Katinat</a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="main-navbar">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="#">Trang chủ <span class="sr-only">(current)</span></a></li>
+                <li><a href="#">Giới thiệu</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Sản phẩm <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">Trà trái cây</a></li>
+                        <li><a href="#">Cà phê</a></li>
+                        <li><a href="#">Trà sữa</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">Sales</a></li>
+                    </ul>
+                </li>
+            </ul>
+
+            <form class="navbar-form navbar-left hidden-xs">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Tìm kiếm sản phẩm...">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="submit">Tìm</button>
+                    </span>
+                </div>
+            </form>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#"><span class="badge">4</span> <i class="glyphicon glyphicon-shopping-cart"></i></a></li>
+                <li><a href="#"><i class="glyphicon glyphicon-user"></i> Đăng ký</a></li>
+                <li><a href="#" data-toggle="modal" data-target="#loginModal">Đăng nhập</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Mobile Search -->
+<div class="container visible-xs-block" style="margin: 60px 0 10px;">
+    <form>
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Tìm kiếm...">
+            <span class="input-group-btn">
+                <button class="btn btn-default" type="submit">Tìm</button>
+            </span>
+        </div>
+    </form>
+</div>
+
+<!-- Logo -->
+<div class="text-center" style="margin: 15px 0;">
+    <a href="https://katinat.vn/">
+        <img src="https://katinat.vn/wp-content/uploads/2023/12/cropped-Kat-Logo-fa-rgb-05__1_-removebg-preview.png" alt="Katinat" height="35">
+    </a>
+</div>
+
+<!-- Slider -->
+<div id="main-slider" class="carousel slide" data-ride="carousel">
+    <ol class="carousel-indicators">
+        <li data-target="#main-slider" data-slide-to="0" class="active"></li>
+        <li data-target="#main-slider" data-slide-to="1"></li>
+        <li data-target="#main-slider" data-slide-to="2"></li>
+    </ol>
+    <div class="carousel-inner">
+        <div class="item active">
+            <img src="https://katinat.vn/wp-content/uploads/2025/06/Banner-Website-2560x948_1.jpg" alt="Sale 11.11" style="width:100%; height:auto;">
+        </div>
+        <div class="item">
+            <img src="https://katinat.vn/wp-content/uploads/2025/06/KAT-TINH-NANG-MOI-DON-NHOM-Website-Landing-Banner-copy.jpg" alt="Sale 12" style="width:100%; height:auto;">
+        </div>
+        <div class="item">
+            <img src="https://katinat.vn/wp-content/uploads/2025/03/KAT_WEBSITE-BANNER.jpg" alt="Astrox 99" style="width:100%; height:auto;">
+        </div>
+    </div>
+    <a class="left carousel-control" href="#main-slider" data-slide="prev">
+        <span class="glyphicon glyphicon-chevron-left"></span>
+    </a>
+    <a class="right carousel-control" href="#main-slider" data-slide="next">
+        <span class="glyphicon glyphicon-chevron-right"></span>
+    </a>
+</div>
+
+<!-- Main Container -->
+<div class="container" style="margin-top: 20px;">
+
+    <!-- Danh mục + Sản phẩm -->
+    <div class="row">
+        <!-- Danh mục bên trái -->
+        <div class="col-sm-4 col-md-3">
+            <h4><strong>Danh mục</strong></h4>
+            <div class="list-group">
+                <a href="#" class="list-group-item">
+                    <span class="badge">10</span> Cà phê
+                </a>
+                <a href="#" class="list-group-item">
+                    <span class="badge">8</span> Trà sữa
+                </a>
+                <a href="#" class="list-group-item">
+                    <span class="badge">5</span> Trà trái cây
+                </a>
+            </div>
+        </div>
+
+        <!-- Danh sách sản phẩm -->
+        <div class="col-sm-8 col-md-9">
+            <h4><strong>Sản phẩm nổi bật</strong></h4>
+            <div class="row">
+                <div class="col-sm-6 col-md-4">
+                    <div class="thumbnail">
+                        <div class="product-image">
+                            <span class="discount-badge">-25%</span>
+                            <span class="status-badge best-seller">Best Seller</span>
+                            <div class="add-to-cart">
+                                <a href="#" title="Thêm vào giỏ"><i class="glyphicon glyphicon-plus-sign"></i></a>
+                            </div>
+                            <img src="https://katinat.vn/wp-content/uploads/2024/03/image.png" alt="Trà Ba lá" class="img-responsive">
+                        </div>
+                        <div class="caption">
+                            <h4 class="pull-right">50.0000 ₫</h4>
+                            <h4><a href="#">Trà Ba lá</a></h4>
+                            <p>TRÀ OOLONG BA LÁ LÀ SỰ CẢI TIẾN MỚI MẺ VỚI CÔNG THỨC PHỐI TRÀ ĐỘC QUYÊNG TỪ NGHỆ NHÂN KATINAT, SỬ DỤNG LÁ TRÀ OOLONG TƯƠI THƯỢNG HẠNG ĐƯỢC HÁI TỪ NHỮNG ĐÔI TRÀ CAO TRÊN 1,000 MÉT</p>
+                            <div class="ratings">
+                                <p class="pull-right"><a href="#">15 đánh giá</a></p>
+                                <div class="rating-display">
+                                    <input id="rating-1" type="text" class="rating" data-size="xs" data-display-only="true" value="5">
+                                </div>
+                                <span class="rating-value">5.0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sản phẩm 2 -->
+                <div class="col-sm-6 col-md-4">
+                    <div class="thumbnail">
+                        <div class="product-image">
+                            <span class="discount-badge">-15%</span>
+                            <span class="status-badge">New</span>
+                            <div class="add-to-cart">
+                                <a href="#" title="Thêm vào giỏ"><i class="glyphicon glyphicon-plus-sign"></i></a>
+                            </div>
+                            <img src="https://katinat.vn/wp-content/uploads/2024/04/2.png" alt="Trà Đào Hồng Đài" class="img-responsive">
+                        </div>
+                        <div class="caption">
+                            <h4 class="pull-right">70.0000 ₫</h4>
+                            <h4><a href="#">Trà Đào Hồng Đài</a></h4>
+                            <p>Thêm Thạch - Thêm Ngon</p>
+                            <div class="ratings">
+                                <p class="pull-right"><a href="#">3 đánh giá</a></p>
+                                <div class="rating-display">
+                                    <input id="rating-2" type="text" class="rating" data-size="xs" data-display-only="true" value="4">
+                                </div>
+                                <span class="rating-value">4.0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chi tiết sản phẩm -->
+    <div class="row" style="margin-top: 40px;">
+        <div class="col-md-12">
+            <h3>Trà Ba Lá</h3>
+            <div class="thumbnail">
+                <div class="row">
+                    <!-- Hình ảnh + xZoom -->
+                    <div class="col-sm-6">
+                        <div class="xzoom-container">
+                            <div class="product-image">
+                                <span class="discount-badge">-20%</span>
+                                <span class="status-badge">New</span>
+                                <img class="xzoom img-responsive fallback-zoom" id="xzoom-main"
+                                     src="https://katinat.vn/wp-content/uploads/2024/03/image.png"
+                                     xoriginal="https://katinat.vn/wp-content/uploads/2024/03/image.png"
+                                     alt="Trà Ba Lá" />
+                            </div>
+
+                            <div class="xzoom-thumbs">
+                                <a href="https://katinat.vn/wp-content/uploads/2024/03/image.png">
+                                    <img class="xzoom-gallery img-responsive" width="80"
+                                         src="https://katinat.vn/wp-content/uploads/2024/03/image.png"
+                                         xpreview="https://katinat.vn/wp-content/uploads/2024/03/image.png"
+                                         alt="Hình 1" />
+                                </a>
+                                <a href="https://katinat.vn/wp-content/uploads/2023/12/357194611_256587093736825_386966657846776321_n-1.jpg">
+                                    <img class="xzoom-gallery img-responsive" width="80"
+                                         src="https://katinat.vn/wp-content/uploads/2023/12/357194611_256587093736825_386966657846776321_n-1.jpg"
+                                         xpreview="https://katinat.vn/wp-content/uploads/2023/12/357194611_256587093736825_386966657846776321_n-1.jpg"
+                                         alt="Hình 2" />
+                                </a>
+                                <a href="https://katinat.vn/wp-content/uploads/2023/12/357194611_256587093736825_386966657846776321_n-1.jpg">
+                                    <img class="xzoom-gallery img-responsive" width="80"
+                                         src="https://katinat.vn/wp-content/uploads/2023/12/357194611_256587093736825_386966657846776321_n-1.jpg"
+                                         xpreview="https://katinat.vn/wp-content/uploads/2023/12/357194611_256587093736825_386966657846776321_n-1.jpg"
+                                         alt="Hình 3" />
+                                </a>
+                                <a href="https://katinat.vn/wp-content/uploads/2024/04/2.png">
+                                    <img class="xzoom-gallery img-responsive" width="80"
+                                         src="https://katinat.vn/wp-content/uploads/2024/04/2.png"
+                                         xpreview="https://katinat.vn/wp-content/uploads/2024/04/2.png"
+                                         alt="Hình 4" />
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Thông tin sản phẩm -->
+                    <div class="col-sm-6">
+                        <h4 class="pull-right text-success">50.0000 ₫</h4>
+                        <h4><a href="#">Trà Ba Lá</a></h4>
+                        <p>TRÀ OOLONG BA LÁ LÀ SỰ CẢI TIẾN MỚI MẺ VỚI CÔNG THỨC PHỐI TRÀ ĐỘC QUYÊNG TỪ NGHỆ NHÂN KATINAT, SỬ DỤNG LÁ TRÀ OOLONG TƯƠI THƯỢNG HẠNG ĐƯỢC HÁI TỪ NHỮNG ĐÔI TRÀ CAO TRÊN 1,000 MÉT</p>
+
+                        <form role="form" class="form-horizontal">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Số lượng</label>
+                                <div class="col-sm-9">
+                                    <input type="number" class="form-control input-sm" value="1" min="1" style="width: 80px;">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Đường</label>
+                                <div class="col-sm-9">
+                                    <select class="form-control">
+                                        <option>Ít đường</option>
+                                        <option>Bình thường</option>
+                                        <option>Nhiều đường</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Size</label>
+                                <div class="col-sm-9">
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-default active">S</button>
+                                        <button type="button" class="btn btn-default">M</button>
+                                        <button type="button" class="btn btn-default">L</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- TRẠNG THÁI KHO HÀNG -->
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Tồn kho</label>
+                                <div class="col-sm-9">
+                                    <div class="progress" style="margin-bottom: 5px; height: 20px;">
+                                        <div id="stock-progress" class="progress-bar progress-bar-success" role="progressbar"
+                                             aria-valuenow="24" aria-valuemin="0" aria-valuemax="100" style="width: 24%;">
+                                            <span class="sr-only">24% còn lại</span>
+                                        </div>
+                                    </div>
+                                    <p class="text-muted small" style="margin: 0;">
+                                        <strong id="stock-text">12</strong> / 50 sản phẩm còn lại
+                                        <span id="stock-status" class="label label-success pull-right">Còn hàng</span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-sm-offset-3 col-sm-9">
+                                    <button type="button" class="btn btn-warning">Liên hệ</button>
+                                    <button type="button" class="btn btn-success">Thêm vào giỏ</button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- Đánh giá -->
+                        <div class="ratings" style="margin-top: 20px;">
+                            <p class="pull-right">3 đánh giá</p>
+                            <div class="rating-display">
+                                <input id="rating-detail" type="text" class="rating" data-size="xs" data-display-only="true" value="4">
+                            </div>
+                            <span class="rating-value">4.0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Đánh giá người dùng -->
+    <div class="row" style="margin-top: 30px;">
+        <div class="col-md-12">
+            <div class="well">
+                <div class="text-right">
+                    <a class="btn btn-success">Viết đánh giá</a>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="rating-display">
+                            <input id="user-rating" type="text" class="rating" data-size="xs" data-display-only="true" value="4">
+                        </div>
+                        <strong>David More</strong>
+                        <span class="pull-right">1 ngày trước</span>
+                        <p><em>Từ: United States</em></p>
+                        <p>This product was great in terms of quality. I would definitely buy another!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trạng thái đơn hàng -->
+    <div class="row" style="margin-top: 40px;">
+        <div class="col-md-12">
+            <h3>Trạng thái đơn hàng</h3>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-xs-2 col-sm-1">
+                            <img class="img-responsive" src="https://katinat.vn/wp-content/uploads/2024/03/image.png" alt="Trà">
+                        </div>
+                        <div class="col-xs-6 col-sm-4">
+                            <a href="#">Trà Ba Lá</a>
+                        </div>
+                        <div class="col-xs-2 col-sm-1 text-center">1</div>
+                        <div class="col-xs-4 col-sm-2 text-right">50.000 ₫</div>
+                        <div class="col-xs-6 col-sm-2">
+                            <button class="btn btn-success btn-sm">Thanh toán</button>
+                        </div>
+                        <div class="col-xs-6 col-sm-2">
+                            <a href="#">1 tin nhắn</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div> <!-- /.container -->
+
+<!-- Modal Đăng nhập -->
+<div class="modal fade" id="loginModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">×</button>
+                <h4 class="modal-title">Đăng nhập</h4>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Tên đăng nhập">
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="form-control" placeholder="Mật khẩu">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Đăng nhập</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- jQuery, Bootstrap JS, xZoom JS từ CDN, Bootstrap Star Rating JS -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/payalord/xZoom@master/dist/xzoom.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/kartik-v/bootstrap-star-rating@4.1.2/js/star-rating.min.js" type="text/javascript"></script>
+
+<script>
+    $(document).ready(function() {
+        // Delay init để Bootstrap load xong
+        setTimeout(function() {
+            // Kiểm tra xZoom có tồn tại không
+            if (typeof $.fn.xzoom === 'undefined') {
+                console.warn('xZoom not loaded. Using fallback CSS zoom.');
+                $('#xzoom-main').addClass('fallback-zoom').removeClass('xzoom');
+                return;
+            }
+
+            // xZoom init với error handling
+            try {
+                $('#xzoom-main').xzoom({
+                    zoomWidth: 400,
+                    zoomHeight: 400,
+                    title: true,
+                    tint: '#333',
+                    Xoffset: 15,
+                    position: 'right',
+                    adaptor: true,
+                    lensRadius: 120,
+                    preload: 1,
+                    root: '#xzoom-main'
+                });
+            } catch (e) {
+                console.warn('xZoom init failed:', e);
+                $('#xzoom-main').addClass('fallback-zoom').removeClass('xzoom');
+            }
+
+            // Chuyển ảnh thumbnail
+            $('.xzoom-gallery').click(function(e) {
+                e.preventDefault();
+                try {
+                    var xzoom = $('#xzoom-main').data('xzoom');
+                    if (xzoom) {
+                        var fullSrc = $(this).attr('href');
+                        var previewSrc = $(this).find('img').attr('xpreview');
+                        xzoom.changeSrc(fullSrc, previewSrc);
+                    }
+                } catch (e) {
+                    console.warn('Thumbnail switch failed:', e);
+                }
+            });
+        }, 500);  // Delay 500ms
+
+        // Cập nhật kho hàng
+        function updateStock(remaining, total) {
+            var percent = Math.round((remaining / total) * 100);
+            var $progress = $('#stock-progress');
+            var $text = $('#stock-text');
+            var $status = $('#stock-status');
+            $text.text(remaining);
+            $progress.attr('aria-valuenow', percent).css('width', percent + '%');
+            $progress.removeClass('progress-bar-success progress-bar-warning progress-bar-danger');
+            $status.removeClass('label-success label-warning label-danger');
+            if (percent > 50) {
+                $progress.addClass('progress-bar-success');
+                $status.addClass('label-success').text('Còn nhiều');
+            } else if (percent > 20) {
+                $progress.addClass('progress-bar-warning');
+                $status.addClass('label-warning').text('Sắp hết');
+            } else if (percent > 0) {
+                $progress.addClass('progress-bar-danger');
+                $status.addClass('label-danger').text('Sắp hết hàng!');
+            } else {
+                $progress.addClass('progress-bar-danger').css('width', '100%');
+                $status.addClass('label-danger').text('Hết hàng');
+                $text.text('0');
+            }
+        }
+        updateStock(12, 50);
+        $('.btn-success').click(function(e) {
+            e.preventDefault();
+            var current = parseInt($('#stock-text').text());
+            if (current > 0) updateStock(current - 1, 50);
+        });
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+</script>
+</body>
+</html>
+<!--Echo Echo-->
